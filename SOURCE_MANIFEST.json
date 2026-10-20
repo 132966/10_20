@@ -1,0 +1,267 @@
+[
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/README.txt",
+    "sha256": "7d46061c0382e05e1c750c49e252f4720fed8836658fa01a2226ecc5cce893c4",
+    "source_sha256": "7d46061c0382e05e1c750c49e252f4720fed8836658fa01a2226ecc5cce893c4"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/README_FIVE_KERNEL_EXAMPLES.md",
+    "sha256": "dff556f66cae7e50a574f282c9ad3d5c93b321940250f03fa48adf2a126f3a8f",
+    "source_sha256": "dff556f66cae7e50a574f282c9ad3d5c93b321940250f03fa48adf2a126f3a8f"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/README_INDEX_BUILD_1K.md",
+    "sha256": "c75023652087bc7d4f5f13a8f45dd8c2d9e89df08099a671edc4870eab1f1558",
+    "source_sha256": "427af735e5e41cd3a29a1665fafcdbfc030fd3a35cddad51731d5b65dc748199"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/README_QUERY_SINGLE_HEAD_EXAMPLE.md",
+    "sha256": "a75d0128e7cf4e39b638c198970a33b8b59129519da0bc330eeff69f8c8d7173",
+    "source_sha256": "a75d0128e7cf4e39b638c198970a33b8b59129519da0bc330eeff69f8c8d7173"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/__init__.py",
+    "sha256": "497725f327c61f053920270bbd92e3de5c875ac50490b95533f538db0244f059",
+    "source_sha256": "497725f327c61f053920270bbd92e3de5c875ac50490b95533f538db0244f059"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/adapter.py",
+    "sha256": "250b5f05ea8b905591a510b3752640888ed4bdf4534536c9e0ad69c61152c903",
+    "source_sha256": "250b5f05ea8b905591a510b3752640888ed4bdf4534536c9e0ad69c61152c903"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/example_v1_query_single_head.py",
+    "sha256": "488b52538cfa6dd4ac30d6c5363dccd307e5fb3b1d2a8947647b657d108c56b0",
+    "source_sha256": "488b52538cfa6dd4ac30d6c5363dccd307e5fb3b1d2a8947647b657d108c56b0"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/kernels.py",
+    "sha256": "12b94babb673e9cc56f7def3b8fa994332b99a53b9e7dfdb9ae5a273c03e3c06",
+    "source_sha256": "12b94babb673e9cc56f7def3b8fa994332b99a53b9e7dfdb9ae5a273c03e3c06"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/query_fused.py",
+    "sha256": "0492ed713960b56d02e88a320d228fed71fb6002c262b7d88963bad791eb9815",
+    "source_sha256": "0492ed713960b56d02e88a320d228fed71fb6002c262b7d88963bad791eb9815"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/runtime.py",
+    "sha256": "ef10a6b10223c03a2eeb88982a500fa9c4f6aeac2a4c02d5a32e3fc0b6bcb6b8",
+    "source_sha256": "ef10a6b10223c03a2eeb88982a500fa9c4f6aeac2a4c02d5a32e3fc0b6bcb6b8"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_deepseek/test_page_management_and_tail_small.py",
+    "sha256": "9a9d00fa4499e54a9ebde67513694f5c586e4c3333a143d41d5b0c4ab75a2671",
+    "source_sha256": "9a9d00fa4499e54a9ebde67513694f5c586e4c3333a143d41d5b0c4ab75a2671"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/README_FUSED_GROUPING_EXAMPLE.md",
+    "sha256": "f8e2dbcdf99276711531e4553867a44e4d66e7f04f8970b2141f2420bf7e13c6",
+    "source_sha256": "f8e2dbcdf99276711531e4553867a44e4d66e7f04f8970b2141f2420bf7e13c6"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/__init__.py",
+    "sha256": "ef3d05e14a6f83a8437dd67baa678888d44a96ad1da61da15a23c81002643ce0",
+    "source_sha256": "ef3d05e14a6f83a8437dd67baa678888d44a96ad1da61da15a23c81002643ce0"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/backend.py",
+    "sha256": "c6fe7afdc2608325944797772e6776af4e741fe32cc4200afcfe9ad25238dc06",
+    "source_sha256": "c6fe7afdc2608325944797772e6776af4e741fe32cc4200afcfe9ad25238dc06"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/build_graph.py",
+    "sha256": "3f8f0477dae80c66b9b01035822d5217b41303bb309cb35d72f2aba6f58c2068",
+    "source_sha256": "3f8f0477dae80c66b9b01035822d5217b41303bb309cb35d72f2aba6f58c2068"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/build_overlap.py",
+    "sha256": "9a27f0afe2acc9a02d4d4235d7b51e6d733d9e6d81e33d0d4b8634db43d07183",
+    "source_sha256": "9a27f0afe2acc9a02d4d4235d7b51e6d733d9e6d81e33d0d4b8634db43d07183"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/bulk_build.py",
+    "sha256": "735d6ae618e080ed19c0d5235f3d5699408d3d5c3496dadb0d1e906f74950d4b",
+    "source_sha256": "735d6ae618e080ed19c0d5235f3d5699408d3d5c3496dadb0d1e906f74950d4b"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/config.py",
+    "sha256": "bf99b3cb9634f143f40f24193bdfa2e53e616fbc7a83732c4a20de1530608333",
+    "source_sha256": "bf99b3cb9634f143f40f24193bdfa2e53e616fbc7a83732c4a20de1530608333"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/decode_query_graph.py",
+    "sha256": "02f74932a245f8cf1435be3ea76276e5dc7b8b653c8bf2674d3b67f7e4f0a911",
+    "source_sha256": "02f74932a245f8cf1435be3ea76276e5dc7b8b653c8bf2674d3b67f7e4f0a911"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/example_fused_grouping.py",
+    "sha256": "5a3a5c884012fe7161b802db7e838dd24d0e6999d6b5017fba820f7ac13a92d7",
+    "source_sha256": "5a3a5c884012fe7161b802db7e838dd24d0e6999d6b5017fba820f7ac13a92d7"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/fused_grouping.py",
+    "sha256": "572d64ce4c741c2cd36af20861c2f7ee208fece2eadf9b0238c9a60a0562752d",
+    "source_sha256": "572d64ce4c741c2cd36af20861c2f7ee208fece2eadf9b0238c9a60a0562752d"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/gpu_owned_arena.py",
+    "sha256": "2948631c852fe300e134f4701783bc18b6d56f3fdd8391ea7a866828beae0d0c",
+    "source_sha256": "2948631c852fe300e134f4701783bc18b6d56f3fdd8391ea7a866828beae0d0c"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/gpu_page_meta.py",
+    "sha256": "0afa493e091c7a60a699390470ac25f4ac43f575c9a1fae4bdd46a875305072c",
+    "source_sha256": "0afa493e091c7a60a699390470ac25f4ac43f575c9a1fae4bdd46a875305072c"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/graph_runtime.py",
+    "sha256": "7f4da8f20237807e0775b47f2f41e61c185c034824f6823816906fb74b019b9c",
+    "source_sha256": "7f4da8f20237807e0775b47f2f41e61c185c034824f6823816906fb74b019b9c"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/group_graph.py",
+    "sha256": "bca11fab188a8d02c5f927533fec60d49fe0a3f4e45bf4ce1bb132976f3833e6",
+    "source_sha256": "bca11fab188a8d02c5f927533fec60d49fe0a3f4e45bf4ce1bb132976f3833e6"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/grouping.py",
+    "sha256": "753040bd57ede8f00452c761da8e05d65fac9652d70912308bba4dde8b6c5f30",
+    "source_sha256": "753040bd57ede8f00452c761da8e05d65fac9652d70912308bba4dde8b6c5f30"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/indirect_mqa.py",
+    "sha256": "bc0eaa06930c477eed46f133245487f4a90bfc9107e4f88bb337a47b7a5b0a6e",
+    "source_sha256": "bc0eaa06930c477eed46f133245487f4a90bfc9107e4f88bb337a47b7a5b0a6e"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/kernels.py",
+    "sha256": "68963bacf24b756251239c71db8e485956c9a137bafe6f5ef0c64b22f51b7e95",
+    "source_sha256": "68963bacf24b756251239c71db8e485956c9a137bafe6f5ef0c64b22f51b7e95"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/pool.py",
+    "sha256": "cd7457b12fc4c9996afcadcfca1c8b89bd225b862e73069e3afab29e429c05c5",
+    "source_sha256": "cd7457b12fc4c9996afcadcfca1c8b89bd225b862e73069e3afab29e429c05c5"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/scoring.py",
+    "sha256": "940caa79d7575a81b16a0697eb248f90069bd7fd37e15b0cce98855816e3e61b",
+    "source_sha256": "940caa79d7575a81b16a0697eb248f90069bd7fd37e15b0cce98855816e3e61b"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/shared_kernels.py",
+    "sha256": "1ce68fe16c7f6c0fcda998d69effe2d0f71a731b08e118c41cea5ba4bf7c58f2",
+    "source_sha256": "1ce68fe16c7f6c0fcda998d69effe2d0f71a731b08e118c41cea5ba4bf7c58f2"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/shared_pool.py",
+    "sha256": "d67cd3e3a318a11288e1482104aaceba59b16b96d61aefc0a8e66a504510f964",
+    "source_sha256": "d67cd3e3a318a11288e1482104aaceba59b16b96d61aefc0a8e66a504510f964"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/shared_query_graph.py",
+    "sha256": "6a515b553b8cd71d3f829cd414621c2596fbe8cd858f45780ad9cfe41d948d6e",
+    "source_sha256": "6a515b553b8cd71d3f829cd414621c2596fbe8cd858f45780ad9cfe41d948d6e"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/shared_scoring.py",
+    "sha256": "b7055a1f9f42f37cea9ca870b41f647b321f929577a0342808819ec36dc1f54d",
+    "source_sha256": "b7055a1f9f42f37cea9ca870b41f647b321f929577a0342808819ec36dc1f54d"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/test_fused_grouping_small.py",
+    "sha256": "4ece4ce97297ba2a6e8b82f65132e5c143f2fd2c3b53ea3baff27548bae68e33",
+    "source_sha256": "4ece4ce97297ba2a6e8b82f65132e5c143f2fd2c3b53ea3baff27548bae68e33"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/test_gather_slots_small.py",
+    "sha256": "8a12f278fa9245922b6841af0859e41a39e314867e4dd9ed07bb8e36598b4f5a",
+    "source_sha256": "8a12f278fa9245922b6841af0859e41a39e314867e4dd9ed07bb8e36598b4f5a"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/deps/__init__.py",
+    "sha256": "561397506e95bb3faeac8ef2e71761183cd1589d7404d0c3acacd693c82a14a2",
+    "source_sha256": "561397506e95bb3faeac8ef2e71761183cd1589d7404d0c3acacd693c82a14a2"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/deps/route.py",
+    "sha256": "4a702ccb3babbac1b198e9058bb64e6da5ab09d07a655fe6efb6e99105e52d8a",
+    "source_sha256": "4a702ccb3babbac1b198e9058bb64e6da5ab09d07a655fe6efb6e99105e52d8a"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/deps/sm90_indirect_mqa.cuh",
+    "sha256": "6194cd50edde939e37790ea6546d78a056e8e442d42c98dcc373dbbd2d80a474",
+    "source_sha256": "6194cd50edde939e37790ea6546d78a056e8e442d42c98dcc373dbbd2d80a474"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/deps/topk2048.py",
+    "sha256": "c11f1189a9ab42e644e05c7413531dd928825c7b7d45644bb083ec353388937e",
+    "source_sha256": "c11f1189a9ab42e644e05c7413531dd928825c7b7d45644bb083ec353388937e"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/deps/topk2048_mapped_20261012.py",
+    "sha256": "295cc77fee7837cc6df860ecef11ce533df277d02de899404601450cf7a1e3c0",
+    "source_sha256": "295cc77fee7837cc6df860ecef11ce533df277d02de899404601450cf7a1e3c0"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/deps/topk_mapped_vendor_20261012/topk_impl.cuh",
+    "sha256": "e8dca47b2089c28bd7b2d1b9b7e061a8b8b0c36528f29d29c8c1981276dc8c17",
+    "source_sha256": "e8dca47b2089c28bd7b2d1b9b7e061a8b8b0c36528f29d29c8c1981276dc8c17"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/deps/topk_mapped_vendor_20261012/topk_v2.cuh",
+    "sha256": "d331672b71c14e16ea1ca91887d6d20170c6ab4fe881be4554ecf36f802c1eeb",
+    "source_sha256": "d331672b71c14e16ea1ca91887d6d20170c6ab4fe881be4554ecf36f802c1eeb"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/deps/topk_vendor/topk_impl.cuh",
+    "sha256": "226a5afb98ae97ab6730ab13e6d0a1a8af7b5c96d13844c36853d2ff6f471cc5",
+    "source_sha256": "226a5afb98ae97ab6730ab13e6d0a1a8af7b5c96d13844c36853d2ff6f471cc5"
+  },
+  {
+    "path": "sglang/srt/layers/attention/v1_native/deps/topk_vendor/topk_v2.cuh",
+    "sha256": "b1b294f708801bedd5e0cc64ad3d5d27d23a2efdaa32f09026c78ed4bdc51c6c",
+    "source_sha256": "b1b294f708801bedd5e0cc64ad3d5d27d23a2efdaa32f09026c78ed4bdc51c6c"
+  },
+  {
+    "path": "sglang/kernels/jit/csrc/deepseek_v4/v1_query.cuh",
+    "sha256": "dc4e614d4c3bc76f2fd880fb08b511e33aca701d73bb158a650552d0c578234b",
+    "source_sha256": "dc4e614d4c3bc76f2fd880fb08b511e33aca701d73bb158a650552d0c578234b"
+  },
+  {
+    "path": "sglang/kernels/jit/csrc/deepseek_v4/topk_v2.cuh",
+    "sha256": "7706f74e012e91948a786a1a0ba62deaab6d860e1fe4e5470ad5dfdf0031a951",
+    "source_sha256": "7706f74e012e91948a786a1a0ba62deaab6d860e1fe4e5470ad5dfdf0031a951"
+  },
+  {
+    "path": "sglang/kernels/jit/include/sgl_kernel/deepseek_v4/topk_impl.cuh",
+    "sha256": "d5ca189166aa3822fba5788072a022f9c8e84f85f922d8af581478357b94bdfe",
+    "source_sha256": "d5ca189166aa3822fba5788072a022f9c8e84f85f922d8af581478357b94bdfe"
+  },
+  {
+    "path": "qwen_gqa_probe_kernels.py",
+    "sha256": "5a526787fea8665ceea956249585adff84b9a7c8f285ba2c72653b9be080f42b",
+    "source_sha256": "5a526787fea8665ceea956249585adff84b9a7c8f285ba2c72653b9be080f42b"
+  },
+  {
+    "path": "qwen_gqa_probe_backend.py",
+    "sha256": "dd0ae64f85bae4e520f6794f2981c75e804b2e0fe3d2f9f987fe5d3d1c3493d9",
+    "source_sha256": "dd0ae64f85bae4e520f6794f2981c75e804b2e0fe3d2f9f987fe5d3d1c3493d9"
+  },
+  {
+    "path": "bench_v1_dynamic_budget_metadata.py",
+    "sha256": "c06b91469e8e994e3716c3229d8ac25f5045fb83870b9fef55235a3a4a56a55a",
+    "source_sha256": "c06b91469e8e994e3716c3229d8ac25f5045fb83870b9fef55235a3a4a56a55a"
+  },
+  {
+    "path": "docs/V1_GROUPING_KERNEL_DETAILED_20261019.md",
+    "sha256": "4b579969e4714748cbfaf6273b9c4b2f1c9c7986535b463a1cedd5062d7bdf75",
+    "source_sha256": "4b579969e4714748cbfaf6273b9c4b2f1c9c7986535b463a1cedd5062d7bdf75"
+  },
+  {
+    "path": "third_party/SGLANG_LICENSE",
+    "sha256": "1495e1e757ef4d0925a2350563cf5754bb23c51701a8ec4fb3c5cdcbedae6747",
+    "source_sha256": "1495e1e757ef4d0925a2350563cf5754bb23c51701a8ec4fb3c5cdcbedae6747"
+  }
+]
