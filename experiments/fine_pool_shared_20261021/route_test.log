@@ -1,0 +1,3 @@
+PASS standalone route: capacity branches, ties, padding, 1024 Q, same-Graph dynamic pages/budget/table
+{"status": "PASS", "device": "NVIDIA H20-3e", "rows": 1024, "key_heads": 1, "query_heads": 32, "route_capacities": [1, 17, 64, 129, 1024, 3904, 4096], "graph_dynamic": ["published page count", "budget", "request page table", "center scores", "indexed end in shared pipeline"], "pipeline": "route -> stage_union -> tables -> DeepGEMM -> normalize -> torch.topk -> map_topk", "limitations": "center scores supplied as fixture; not full SGLang inference; no fused.topk integration; no performance claim"}
+Warning: please use at least NVCC 12.9 for the best DeepGEMM performance

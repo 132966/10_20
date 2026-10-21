@@ -1,0 +1,14 @@
+{
+  "source": "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/IA/xiaobin14/zhanghao/helmet_qwen3_4b_20261010/qwen3_gqa_v1_dsa_bucket1k_overlap_20261017/sglang/kernels/jit/csrc/deepseek_v4/v1_query.cuh",
+  "source_sha256": "dc4e614d4c3bc76f2fd880fb08b511e33aca701d73bb158a650552d0c578234b",
+  "adapted_function": "v1_route_main",
+  "scope": "Independent route_shared.cu only; original source unchanged",
+  "changes": [
+    "published active page count input",
+    "map page ranks through rt before selected output",
+    "emit clamped takes",
+    "remove old tail table writer",
+    "safe zero/padding path"
+  ],
+  "capacity_scope": "4096 index pages, 256K Index K positions, approx 1M original tokens at C4; retain static shared memory"
+}

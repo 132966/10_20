@@ -2,7 +2,9 @@
 
 本文只保留 MLA Index 输入下的 V1 核心实现，以及新的共享精筛实现。假设后端已提供符合接口的 Index K＋scale、Index Q 和权重，不包含 GQA 输入适配、非分页 DSA 对照、旧实现及备用路径。原总表保留不变。
 
-**集成状态：建索引和粗筛来自现有 V1；共享精筛是已测试的独立实验，尚未替换原 SGLang。下面是模块清单，不表示它们已作为一条完整生产链路接通。**
+**集成状态：建索引和粗筛来自现有 V1；共享精筛仍是独立实验，尚未替换原 SGLang。本目录新增物理页输出 route 适配及连接精筛的测试，中心分数由测试提供，不代表完整模型推理接通。**
+
+详细讲解见 [全部15个算子的输入、流程、例子与输出](MLA_INDEX_KERNELS_INPUT_OUTPUT.md)。
 
 ## 文件位置
 
@@ -11,6 +13,7 @@
 | G | [fused_grouping.py](../../sglang/srt/layers/attention/v1_native/fused_grouping.py) |
 | V | [kernels.py](../../sglang/srt/layers/attention/v1_deepseek/kernels.py) |
 | C | [v1_query.cuh](../../sglang/kernels/jit/csrc/deepseek_v4/v1_query.cuh) |
+| R | 当前目录 [route_shared.cu](route_shared.cu)、[route_shared.py](route_shared.py) |
 | S | 当前目录 [tail_union.py](tail_union.py) |
 | E | 当前目录 [kernels.py](kernels.py) |
 
@@ -28,7 +31,7 @@
 | 页分配 | `allocate` | 复用或分配页，更新引用计数、桶页表和新页标记 | Triton | V |
 | 页发布 | `publish` | 写入重排页、成员、指纹及桶对应的中心 | Triton | V |
 | 页回收 | `release` | 减引用计数，将零引用页归还空闲栈 | Triton | V |
-| 粗筛融合 | `fused.route / v1_route_main` | 每页 8 个中心取 max、页面 TopK、按配置写候选物理页表 | CUDA C++ | C |
+| 粗筛融合 | `fused.route / v1_route_main` 的物理页适配 | 每页8中心取max、页面TopK、输出物理页编号及实际数量；有效页数使用已发布数量 | CUDA C++ | R（原逻辑来自C） |
 | 公共页复制 | `stage_union` | 根据实际已发布索引终点，将 chunk 公共 sink＋tail 页复制一次到精筛池后缀 | Triton | S |
 | 精筛页表与长度 | `tables` | 组织历史候选页和共享页引用，生成打分长度及紧凑候选长度 | Triton | E |
 | 精筛分数整理 | `normalize` | 过滤边界、因果和历史重复覆盖，恢复紧凑候选分数布局 | Triton | E |
@@ -66,7 +69,7 @@
 ```text
 原生 Index Q、权重、长度、预算和已发布索引边界
 → 中心打分（DeepGEMM）
-→ fused.route 选择历史候选页
+→ route 物理页适配：选择历史候选页，输出物理页编号和实际数量
 → stage_union 将公共 sink＋tail 复制一次到同一精筛池
 → tables 生成各 Q 页表和长度
 → 动态生成 DeepGEMM 调度元数据
@@ -77,7 +80,9 @@
 → 原生 MLA attention
 ```
 
-独立实验实际计时从公共页准备开始，历史候选页由测试输入提供；不包含粗筛、建索引和 MLA attention。上述完整组织方式不是已经测过的端到端链路。
+原性能实验实际计时从公共页准备开始，历史候选页由测试输入提供；不包含粗筛、建索引和 MLA attention。新增 [route连接测试](test_route_shared.py) 从中心分数输入开始执行route和共享精筛链路；不包括中心点积、建索引和attention，也没有更新原性能数字。
+
+原route的selected输出请求页序号；新 [route_shared](route_shared.py) 内部经rt转换后输出物理页，直接匹配tables。新适配容量上限为4096页，即256K个Index K位置，C4下对应约1M原始token；保留静态共享内存。新route不再从Q长度猜测有效页数，而读取published设备数组；调用方保证它与END及rt的发布状态一致。
 
 ### 动态输入和正确性
 
@@ -99,7 +104,7 @@
 
 这些是共享精筛实验结果，不是整条 V1 查询或 attention 的加速比。详见 [实验说明](README.md) 和 [结果数据](results.json)。
 
-## 建索引建索引为什么这么快，之前借鉴ClusterKV做了哪些改进
+## 建索引为什么这么快，之前借鉴ClusterKV做了哪些改进
 
 借鉴的是“把K分组、用中心做粗筛、把成员重排存储”的思路。当前实现的速度主要来自下面几处设计；构建与其他计算overlap，则进一步减少推理关键路径上的等待。
 
