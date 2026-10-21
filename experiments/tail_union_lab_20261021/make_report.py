@@ -1,96 +1,126 @@
 import json
 from pathlib import Path
 p=Path(__file__).parent
-r=json.loads((p/'results.json').read_text());q=json.loads((p/'prepared_results.json').read_text());c=json.loads((p/'consumer_results.json').read_text())
-s='''# Chunk 共享尾部准备：独立算子实验
+r=json.loads((p/'results.json').read_text());q=json.loads((p/'prepared_results.json').read_text());c=json.loads((p/'consumer_results.json').read_text());reg=json.loads((p/'published_end_results.json').read_text())
+s='''# Chunk 共享尾部准备：已发布索引边界修正版
 
-此目录与 SGLang 项目无依赖，未修改原实现。GPU：NVIDIA H20-3e。
-只优化 sink/tail 的 Index K+scale 搬运，不含建索引、粗筛、TopK 或 attention。
+独立 Triton 实验，GPU NVIDIA H20-3e；没有修改原 SGLang 项目，没有接入完整查询或 attention。
 
-## 实现
+## 本次修正
 
-- `baseline.py`：原 `stage_tail_shared` 的逐字函数快照，原文件路径及 SHA256 在 `provenance.json`。
-- `union.py`：新 Triton `stage_union`，以及推荐入口 `PreparedStage`。
-- `consumer.py`：直接读取共享缓存的示例尾部打分 kernel；1 K head、32 Q heads。
-- `test_bench.py`：逐字节正确性、6种配置调优、原算子 GROUP=1/2/4/8 调优。
-- `test_prepared.py`：预绑定视图入口性能、同一 Graph 清零/增长/缩短长度及更换物理页表。
-- `test_consumer.py`：1024 Q 的打分逐项对比、PyTorch 独立参考、准备+打分计时。
+旧实验用 `(n-1)//1024*1024` 推算已建索引边界，这是不成立的：chunk执行期间即使长度跨过1K边界，也不代表新桶已经完成并发布。
+历史65536、4K chunk、2K window时，旧式使最后一个Q的tail从67584开始，漏掉没有索引的65536～67583。
+新增 GPU `indexed_end: [1], int32`，表示本次查询实际可用的连续索引覆盖终点（不包含终点）。它是动态输入，不由Q长度推算，不是编译期常量。
 
-## 输入输出
+```python
+sink = min(n, SINK)
+e = min(max(indexed_end, 0), n)
+tail = max(sink, min(e, max(sink, n - WINDOW)))
+count = sink + n - tail
+```
 
-| 输入/输出 | shape / dtype | 含义 |
+候选集合严格等于：`sink ∪ 最近WINDOW个可见位置 ∪ [indexed_end,n)`。
+这只扩大精筛候选，不意味着所有未建索引token都直接进入attention；最终仍可Top2048。
+
+## 文件
+
+- `union.py`：`stage_union` 融合公共页复制、逐Q元数据；`PreparedStage` 预绑定视图和启动参数。
+- `baseline.py`：原项目函数的未修改快照，仅用于溯源，**不再用于正确性或性能基线**。
+- `baseline_published.py`：修正已发布边界后的逐Q复制基线；与共享方案使用相同候选语义。
+- `consumer.py`：直接读取共享缓存的示例精筛打分，1 K head/32 Q heads，没有逐Q重新复制。
+- `test_bench.py`：逐字节对比、独立集合覆盖检查、6种搬运配置与4种基线GROUP调优。
+- `test_published_end.py`：4K遗漏回归、索引滞后、非对齐边界、同图动态修改indexed_end。
+- `test_prepared.py`：准备算子计时，空长度/增长/缩短回放。
+- `test_consumer.py`：1K和4K Q打分、PyTorch参考、65537进入最后Q的Top2048回归。
+- `provenance.json`：原项目文件路径和SHA256，测试验证原文件未改变。
+
+旧实验结果在Git历史中保留；本地另有 `archive_before_published_end_fix/` 快照。旧加速比不能代表修正后的语义。
+
+## 输入输出与调用
+
+| 参数 | shape / dtype | 含义 |
 |---|---|---|
-| src | [P,8448], uint8 | 一页8192字节FP8 K，接256字节FP32 scale；单K head |
-| nt | [NP], int32 | 一个请求的逻辑页到物理页映射，所有Q共用 |
-| lens | [R], int32 | 各Q动态可见长度，必须非负且单调不减 |
-| dst | [U,8448], uint8 | 预分配公共候选页容量，回放时不得超容量 |
-| meta | [R,3], int32 | 每Q的 [sink数量, tail逻辑起点, 候选数量] |
-| desc | [4], int32 | [sink页数, tail逻辑页起点, 末尾逻辑页上界, 有效公共页数] |
+| src | [P,8448], uint8 | 每页8192字节FP8 K＋256字节FP32 scale |
+| nt | [NP], int32 | 同一请求的逻辑页→原生物理页 |
+| lens | [R], int32 | 各Q动态可见长度，非负且单调不减 |
+| indexed_end | [1], int32 | 实际发布且可用的连续索引覆盖终点 |
+| dst | [U,8448], uint8 | 公共页缓存预分配容量 |
+| meta | [R,3], int32 | 每Q的[sink数量,tail逻辑起点,候选数量] |
+| desc | [4], int32 | [sink页数,tail逻辑页起点,结束页上界,有效公共页数] |
 
-stage kernel 没有 Q 输入，无需人为增加 Q-head 维度。
+```python
+indexed_end = torch.tensor([65536], dtype=torch.int32, device='cuda')
+plan = PreparedStage(src, nt, lens, indexed_end, dst, meta, desc,
+                     sink=64, window=2048)
+plan()  # 支持CUDA Graph捕获；原地更新lens、nt、indexed_end后回放
+```
 
-## 方法
+每个请求/层/K head的实际发布进度可能不同，调用者必须给当前这一次查询对应的进度，不能用全局最大完成编号。
+只有连续前缀已发布且查询流通过事件可见时，才能推进indexed_end；有空洞应停在最早未覆盖位置。
+当前实现以一个请求、一个K head、整个chunk同一个发布快照为契约。
+**复制到打分完成期间不可并发修改lens、nt、indexed_end或覆盖dst**。推进发布进度不需要重捕图，但要按流/事件保证顺序。
 
-沿用原式逐Q计算 sink/tail，不改变任何候选集合。因长度单调，首Q的tail起点最早，末Q的可见终点最远。
-公共页是 `[0, ceil(sink_last/64))` 与 `[max(sink_pages, floor(tail_first/64)), ceil(n_last/64))`。
-两个页区间不会重复。完整页按int32视图搬运，保留FP8和FP32原始位模式，不进行数值转换。
-复制和逐Q元数据生成融合为一次启动。默认1K chunk用256个word/program、4warps；4K chunk用512个word/program。
-逐页4096word方案和其他tile大小也经过测试，当前场景未胜过这些配置。
+## 4K具体例子
 
-完整页可能包含边界外的字节，它们只是存储，不属于任何Q的候选。
-消费端对候选编号 i 要求 `i<count`，先生成逻辑编号：`logical=i if i<sink else tail+i-sink`。
-再令 `lp=logical//64`，共享页编号是 `lp if lp<sink_pages else sink_pages+lp-tail_page`。
-页内位置是 `logical%64`。示例consumer按此映射直接打分，不重建每Q缓存，不泄漏未来token。
-`reconstruct_for_test` 仅用于逐字节比较，不在优化路径计时中。
+历史65536，R=4096，SINK=64，WINDOW=2048，indexed_end=65536。
 
-**不是原 fine_table 的直接替换**：旧接口把每Q尾部连续打包，新布局需要消费端上述映射及mask。
-本目录实现了可验证的示例consumer，但没有接入项目DeepGEMM或完整查询。
+| Q | 可见长度 | tail起点 | sink+tail候选数 |
+|---|---:|---:|---:|
+| 0 | 65537 | 63489 | 2112 |
+| 2047 | 67584 | 65536 | 2112 |
+| 2048 | 67585 | 65536 | 2113 |
+| 4095 | 69632 | 65536 | 4160 |
+
+最后一个Q包含65537。公共页仍为原逻辑页0和992～1087，`desc=[1,992,1088,97]`。
+最后Q读取公共页33的页内位置1，即逻辑65537；不会因为它在2K窗口外而被丢弃。
+
+## 布局、容量和性能优化
+
+公共页区间是 `[0,ceil(sink_last/64))` 与 `[max(sink_pages,floor(tail_first/64)),ceil(n_last/64))`。
+页只复制一次，以int32视图搬运原始位模式；4K默认512 word/program、4warps，1K默认256 word/program。
+元数据生成融合到同一次启动。消费端按候选编号还原logical，再映射共享页，不复制成每Q独立缓冲区。
+按整页复制可能搬入候选之外的字节，但consumer必须根据每Q count及logical访问；示例严格过滤未来位置。
+
+容量必须依据**支持的最大可见长度和最小发布终点**计算。若索引可能滞后，不能只按chunk大小＋窗口估计容量。
+测试 `Case(..., min_indexed_end=...)` 显式预留动态回放最坏边界对应的共享空间和逐Q基线空间。
+PreparedStage不做GPU→CPU读回，调用者须验证实际端点、页表和容量；不是自动扩容接口。
+旧精筛页表不能直接复用：需接入此处共享地址映射和mask。本实验只提供示例consumer，没有修改项目DeepGEMM/TopK。
 
 ## 正确性
 
-9组场景×6配置通过；包括短序列、非64对齐sink/window、跨桶、零窗口、1K/4K chunk。
-原输出与共享映射重建结果按全部字节比较一致，含scale和末页补零；空闲未写区域保留哨兵。
-同一Graph更新长度与页表通过，另验证空长度→增长→缩短→增长，输出一致。
-尾部打分输入Q=[1024,32,128]，新旧分数完全一致，首/中/末Q通过PyTorch FP32参考核对。
-原文件SHA256复核一致。
+修正逐Q基线与共享结果逐字节一致，包括K、scale、末页补零和未写哨兵。
+独立集合oracle逐Q核对sink、window、全部未建索引可见token的并集，不只对照同一公式实现。
+9组基础场景×6配置，以及5组发布边界回归×6配置通过；覆盖索引滞后4096、非对齐终点、无已建索引、零窗口。
+同一Graph在不改变Q长度时，把indexed_end依次更新为65536、61440、61001、65536，并改变物理页表，均通过。
+1K/4K打分与逐Q基线完全相同；首/中/末Q通过PyTorch参考。
+另给token65537注入高分，确认它进入4K chunk最后Q的Top2048。TopK回归只验证示例尾部候选，不代表完整V1模型精度。
 
-## 性能
+## 修正后性能：仅尾部准备
 
-下表仅计 **尾部准备**，使用 PreparedStage，包含逐Q元数据输出。
-Graph列用triton do_bench_cudagraph(rep=50ms)；非Graph列用CUDA Event覆盖50次Python连续提交，5组中位数。
-非Graph包含GPU等待CPU提交的间隙，不是纯kernel执行时间。预分配/初始化/JIT编译均在计时之外。
-基线逐Q owner、自身原算子，并在GROUP=1/2/4/8中选最快；新旧计时顺序固定，数值有频率/缓存影响。
-这里报告的是warm replay microbenchmark，不是端到端模型吞吐率。
+两边都使用实际发布终点，表中indexed_end等于历史长度；基线GROUP=1/2/4/8调优。
+Graph：triton do_bench_cudagraph(rep=50ms)。非Graph：CUDA Event计时50次Python连续提交，5组中位数，包含GPU等CPU提交的间隙。
+初始化、预分配、编译不计时；warm microbenchmark，未锁GPU频率，计时存在波动，不是模型吞吐。
 
-| 历史长度 | Q数 | sink/window | 基线非Graph μs | 新非Graph μs | 加速 | 基线Graph μs | 新Graph μs | 加速 |
+| 历史长度 | Q数 | sink/window | 修正基线非Graph μs | 共享非Graph μs | 加速 | 修正基线Graph μs | 共享Graph μs | 加速 |
 |---|---:|---|---:|---:|---:|---:|---:|---:|
 '''
 for x in q['results']:
  h,n,si,w=x['case'];s+=f"| {h} | {n} | {si}/{w} | {x['old_eager_us']:.2f} | {x['prepared_eager_us']:.2f} | {x['eager_speedup']:.2f}× | {x['old_graph_us']:.2f} | {x['prepared_graph_us']:.2f} | {x['graph_speedup']:.2f}× |\n"
-x=r['results'][0]
-s+=f"\n64K历史、1K chunk、64 sink/2048 window：基线目标缓存 {x['old_reserved_bytes']/2**20:.2f} MiB，公共预留缓存及元数据 {x['new_reserved_bytes']/2**20:.3f} MiB；实际写入从 {x['old_written_bytes']/2**20:.2f} MiB 降到 {x['new_written_bytes']/1024:.2f} KiB。以上不计双方共用原生pool；新接口还省去重复的逐Q原生页表。\n"
-s+=f"\n### 准备＋示例尾部打分\n\n非对齐案例：历史65549，1024 Q，sink17/window2049。\n\n| 模式 | 基线 μs | 新实现 μs | 加速 |\n|---|---:|---:|---:|\n| 非Graph | {c['eager_old_us']:.2f} | {c['eager_new_us']:.2f} | {c['eager_speedup']:.2f}× |\n| Graph | {c['graph_old_us']:.2f} | {c['graph_new_us']:.2f} | {c['graph_speedup']:.2f}× |\n\n此项使用通用launch入口；不是项目精筛性能，也不包含粗筛、最终TopK和attention，不能当作完整查询加速比。\n"
+x=next(x for x in r['results'] if x['case'][:2]==[65536,4096])
+s+=f"\n4K案例：逐Q基线实际写入{x['old_written_bytes']/2**20:.2f} MiB，共享写入（含元数据）{x['new_written_bytes']/1024:.2f} KiB。逐Q预留{x['old_reserved_bytes']/2**20:.2f} MiB，共享预留含元数据{x['new_reserved_bytes']/2**20:.3f} MiB。\n"
+s+='\n## 准备＋示例尾部打分\n\n| Q数 | 非Graph基线 μs | 非Graph共享 μs | 加速 | Graph基线 μs | Graph共享 μs | 加速 |\n|---:|---:|---:|---:|---:|---:|---:|\n'
+for x in c['results']:
+ s+=f"| {x['case'][1]} | {x['eager_old_us']:.2f} | {x['eager_new_us']:.2f} | {x['eager_speedup']:.2f}× | {x['graph_old_us']:.2f} | {x['graph_new_us']:.2f} | {x['graph_speedup']:.2f}× |\n"
 s+='''
-## 使用与约束
+此项不包含历史重排页的精筛、粗筛、最终TopK和attention，不能称为完整查询加速比。
 
-```python
-plan = PreparedStage(src, nt, lens, dst, meta, desc, sink=64, window=2048)
-plan()  # 或在CUDA Graph中捕获；之后原地更新lens/nt再回放
-```
-
-同一请求、单个K head、单调长度是契约。不同请求/不同K head分别处理，不能把不同请求共用一个nt。
-上游须保证原生页已写完、其生命周期覆盖复制；后续consumer在同一流或等待完成事件。
-共享dst也必须等consumer结束后再复用，不能被下一chunk提前覆盖。
-预留U需覆盖所允许的全部回放长度和union范围；此实验用固定window和chunk容量给保守上界。
-热路径不做CPU .item()、不同步、不动态分配；调用前验证容量/页表有效性是调用者责任。
-
-运行全部测试并生成本文件：
+## 运行
 
 ```bash
 bash /home/hadoop-friday-llm/tail_union_lab_20261021/run.sh
 ```
 
-原始数字：`results.json`、`prepared_results.json`、`consumer_results.json`。
+环境依赖路径保留为本机配置；其他机器需要自行提供PyTorch、Triton及CUDA环境。
+原始结果：results.json、prepared_results.json、consumer_results.json、published_end_results.json。
 '''
-(p/'README.md').write_text(s)
-print(p/'README.md')
+(p/'README.md').write_text(s);print(p/'README.md')

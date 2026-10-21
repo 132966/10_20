@@ -1,0 +1,54 @@
+{
+  "independent_coverage_cases": [
+    [
+      65536,
+      4096,
+      64,
+      2048,
+      65536
+    ],
+    [
+      65536,
+      4096,
+      64,
+      2048,
+      61440
+    ],
+    [
+      2051,
+      65,
+      17,
+      0,
+      1025
+    ],
+    [
+      17,
+      129,
+      65,
+      128,
+      0
+    ],
+    [
+      0,
+      65,
+      0,
+      0,
+      0
+    ]
+  ],
+  "all_six_configs": "PASS",
+  "last_Q_meta": [
+    64,
+    65536,
+    4160
+  ],
+  "old_formula_misses_65537": true,
+  "new_formula_includes_65537": true,
+  "dynamic_indexed_end_same_graph": [
+    65536,
+    61440,
+    61001,
+    65536
+  ],
+  "status": "PASS"
+}

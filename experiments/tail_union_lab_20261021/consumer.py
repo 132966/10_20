@@ -5,10 +5,10 @@ Not a replacement for the project's DeepGEMM/TopK pipeline.
 import triton as tr
 import triton.language as tl
 @tr.jit
-def score_tail(Q,W,K,KS,LENS,DESC,OUT,SINK:tl.constexpr,WINDOW:tl.constexpr,SCRATCH:tl.constexpr,SHARED:tl.constexpr):
+def score_tail(Q,W,K,KS,LENS,INDEXED_END,DESC,OUT,SINK:tl.constexpr,WINDOW:tl.constexpr,SCRATCH:tl.constexpr,SHARED:tl.constexpr):
     r,p=tl.program_id(0),tl.program_id(1)
     n=tl.load(LENS+r);s=tl.minimum(n,SINK)
-    t=tl.maximum(s,tl.minimum(tl.maximum(n-1,0)//1024*1024,tl.maximum(s,n-WINDOW)))
+    t=tl.maximum(s,tl.minimum(tl.minimum(tl.maximum(tl.load(INDEXED_END),0),n),tl.maximum(s,n-WINDOW)))
     count=s+n-t
     i=p*64+tl.arange(0,64);d=tl.arange(0,128);h=tl.arange(0,32)
     valid=i<count
