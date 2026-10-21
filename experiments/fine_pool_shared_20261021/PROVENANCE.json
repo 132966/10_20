@@ -1,0 +1,11 @@
+{
+  "tail_union.py": {
+    "source": "/home/hadoop-friday-llm/tail_union_lab_20261021/union.py",
+    "sha256": "054ddbd242c5b423b97d95be4474395240cb421137d603b7187a42091582d581"
+  },
+  "baseline_published.py": {
+    "source": "/home/hadoop-friday-llm/tail_union_lab_20261021/baseline_published.py",
+    "sha256": "a9c01d7a214274640b609f9c2d3fc963ae5423320047163acef72689b435ea3e"
+  },
+  "deepgemm_interface_source": "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/IA/xiaobin14/zhanghao/helmet_qwen3_4b_20261010/qwen3_gqa_v1_dsa_bucket1k_overlap_20261017/sglang/kernels/ops/attention/dsa/paged_mqa_logits.py"
+}

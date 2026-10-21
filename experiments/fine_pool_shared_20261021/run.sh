@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname "$0")"
+source /mnt/dolphinfs/ssd_pool/docker/user/hadoop-efficient-llm/wangchangran/sglang_sparse/activate_cuda_compat.sh
+export PYTHONPATH=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-efficient-llm/wangchangran/sglang_sparse/sglangenv/lib/python3.12/site-packages
+/usr/local/bin/python3.12 -u test_and_bench.py 2>&1 | tee run.log

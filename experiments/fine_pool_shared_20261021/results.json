@@ -1,0 +1,160 @@
+{
+  "gpu": "NVIDIA H20-3e",
+  "torch": "2.13.0+cu130",
+  "tests": [
+    {
+      "case": [
+        4096,
+        4,
+        17,
+        0
+      ],
+      "status": "PASS"
+    },
+    {
+      "case": [
+        65536,
+        1024,
+        64,
+        2048
+      ],
+      "status": "PASS"
+    },
+    {
+      "case": [
+        65549,
+        1024,
+        17,
+        2049
+      ],
+      "status": "PASS"
+    },
+    {
+      "case": [
+        65536,
+        4096,
+        64,
+        2048
+      ],
+      "status": "PASS"
+    }
+  ],
+  "results": [
+    {
+      "case": [
+        65536,
+        1024,
+        64,
+        2048
+      ],
+      "K_heads": 1,
+      "Q_heads": 32,
+      "selected_pages": 40,
+      "baseline_group": 4,
+      "fine_pool_bytes_baseline": 286015488,
+      "fine_pool_bytes_shared": 971520,
+      "staging_and_tables": {
+        "baseline_graph_us": 85.39982281890805,
+        "shared_graph_us": 4.020390389622121,
+        "graph_speedup": 21.24167420142869,
+        "baseline_eager_us": 83.05439949035645,
+        "shared_eager_us": 43.166399002075195,
+        "eager_speedup": 1.9240520731498512
+      },
+      "staging_tables_schedule_DeepGEMM_mask": {
+        "baseline_graph_us": 262.5310769447913,
+        "shared_graph_us": 185.70151650832474,
+        "graph_speedup": 1.4137260797922586,
+        "baseline_eager_us": 262.03839778900146,
+        "shared_eager_us": 208.42878818511963,
+        "eager_speedup": 1.25720827756417
+      },
+      "plus_common_torch_TopK_and_mapping": {
+        "baseline_graph_us": 507.4640485975478,
+        "shared_graph_us": 433.9402547696742,
+        "graph_speedup": 1.1694329876514875,
+        "baseline_eager_us": 536.0671997070312,
+        "shared_eager_us": 465.65442085266113,
+        "eager_speedup": 1.1512125209193484
+      }
+    },
+    {
+      "case": [
+        65536,
+        4096,
+        64,
+        2048
+      ],
+      "K_heads": 1,
+      "Q_heads": 32,
+      "selected_pages": 40,
+      "baseline_group": 4,
+      "fine_pool_bytes_baseline": 2249736192,
+      "fine_pool_bytes_shared": 1377024,
+      "staging_and_tables": {
+        "baseline_graph_us": 480.64702790358973,
+        "shared_graph_us": 6.22506657796299,
+        "graph_speedup": 77.21154816321184,
+        "baseline_eager_us": 426.2335777282715,
+        "shared_eager_us": 42.99359917640686,
+        "eager_speedup": 9.913884529168964
+      },
+      "staging_tables_schedule_DeepGEMM_mask": {
+        "baseline_graph_us": 1325.0380154313712,
+        "shared_graph_us": 804.9857560978379,
+        "graph_speedup": 1.6460390825478484,
+        "baseline_eager_us": 1355.7519912719727,
+        "shared_eager_us": 834.4079971313477,
+        "eager_speedup": 1.6248070439556899
+      },
+      "plus_common_torch_TopK_and_mapping": {
+        "baseline_graph_us": 2245.324639713063,
+        "shared_graph_us": 1839.9353935605002,
+        "graph_speedup": 1.2203279786732537,
+        "baseline_eager_us": 2282.1056365966797,
+        "shared_eager_us": 1877.2655487060547,
+        "eager_speedup": 1.2156541402305443
+      }
+    },
+    {
+      "case": [
+        65549,
+        4096,
+        17,
+        2049
+      ],
+      "K_heads": 1,
+      "Q_heads": 32,
+      "selected_pages": 40,
+      "baseline_group": 4,
+      "fine_pool_bytes_baseline": 2249736192,
+      "fine_pool_bytes_shared": 1385472,
+      "staging_and_tables": {
+        "baseline_graph_us": 474.3198524821888,
+        "shared_graph_us": 6.175965833437951,
+        "graph_speedup": 76.80091912330917,
+        "baseline_eager_us": 421.3679790496826,
+        "shared_eager_us": 42.83199906349182,
+        "eager_speedup": 9.837691171618436
+      },
+      "staging_tables_schedule_DeepGEMM_mask": {
+        "baseline_graph_us": 1342.499773842948,
+        "shared_graph_us": 806.9025438885355,
+        "graph_speedup": 1.6637694155397271,
+        "baseline_eager_us": 1349.287986755371,
+        "shared_eager_us": 828.604793548584,
+        "eager_speedup": 1.6283854465491427
+      },
+      "plus_common_torch_TopK_and_mapping": {
+        "baseline_graph_us": 2240.7862494973574,
+        "shared_graph_us": 1841.364251999628,
+        "graph_speedup": 1.216916341817746,
+        "baseline_eager_us": 2279.4591903686523,
+        "shared_eager_us": 1881.1775207519531,
+        "eager_speedup": 1.2117193434554205
+      }
+    }
+  ],
+  "unindexed_65537_last_Q_top2048": "PASS",
+  "same_graph_dynamic_lengths_budget_pages_published_end_and_empty": "PASS"
+}
