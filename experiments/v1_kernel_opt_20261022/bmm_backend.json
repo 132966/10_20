@@ -1,0 +1,7 @@
+{
+  "cuda_kernel_names": [
+    "sm80_xmma_gemm_f32f32_f32f32_f32_nn_n_tilesize32x32x8_stage3_warpsize1x2x1_ffma_aligna4_alignc4_execute_kernel__5x_cublas"
+  ],
+  "float32_matmul_precision": "highest",
+  "allow_tf32": false
+}

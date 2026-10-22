@@ -1,0 +1,10 @@
+{
+  "fused_grouping.py": {
+    "source": "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/IA/xiaobin14/zhanghao/helmet_qwen3_4b_20261010/qwen3_gqa_v1_dsa_bucket1k_overlap_20261017/sglang/srt/layers/attention/v1_native/fused_grouping.py",
+    "sha256": "572d64ce4c741c2cd36af20861c2f7ee208fece2eadf9b0238c9a60a0562752d"
+  },
+  "kernels.py": {
+    "source": "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-hldy-nlp/IA/xiaobin14/zhanghao/helmet_qwen3_4b_20261010/qwen3_gqa_v1_dsa_bucket1k_overlap_20261017/sglang/srt/layers/attention/v1_deepseek/kernels.py",
+    "sha256": "12b94babb673e9cc56f7def3b8fa994332b99a53b9e7dfdb9ae5a273c03e3c06"
+  }
+}

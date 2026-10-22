@@ -1,0 +1,54 @@
+{
+  "gpu": "NVIDIA H20-3e",
+  "records": [
+    {
+      "cap": 32,
+      "build_and_release": {
+        "original": {
+          "eager_us": 647.5308990478516,
+          "graph_us": 106.16433673434787
+        },
+        "optimized": {
+          "eager_us": 355.382080078125,
+          "graph_us": 68.97354184127435
+        }
+      },
+      "initialize_and_grouping": {
+        "original": {
+          "eager_us": 556.5718460083008,
+          "graph_us": 89.55809755145378
+        },
+        "optimized": {
+          "eager_us": 264.35583114624023,
+          "graph_us": 55.256143638065886
+        }
+      }
+    },
+    {
+      "cap": 4096,
+      "build_and_release": {
+        "original": {
+          "eager_us": 655.0752258300781,
+          "graph_us": 105.59067829795505
+        },
+        "optimized": {
+          "eager_us": 353.8982391357422,
+          "graph_us": 68.79707014704326
+        }
+      },
+      "initialize_and_grouping": {
+        "original": {
+          "eager_us": 559.5676803588867,
+          "graph_us": 89.32990661034216
+        },
+        "optimized": {
+          "eager_us": 264.1222381591797,
+          "graph_us": 55.01222697966689
+        }
+      }
+    }
+  ],
+  "exact": true,
+  "graph_replay_dynamic": true,
+  "note": "build timing includes release for a repeatable fresh allocation lifecycle; no CPU uploads inside timed run"
+}

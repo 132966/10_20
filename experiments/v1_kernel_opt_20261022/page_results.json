@@ -1,0 +1,299 @@
+{
+  "gpu": "NVIDIA H20-3e",
+  "records": [
+    {
+      "op": "fingerprint",
+      "cap": 32,
+      "timing": {
+        "original": {
+          "eager_us": 12.462400197982788,
+          "graph_us": 3.226470084417434
+        },
+        "words": {
+          "eager_us": 12.43008017539978,
+          "graph_us": 2.288781953550473
+        }
+      }
+    },
+    {
+      "op": "match_miss",
+      "cap": 32,
+      "timing": {
+        "original": {
+          "eager_us": 16.90559983253479,
+          "graph_us": 1.4755165831927948
+        },
+        "words": {
+          "eager_us": 16.92896008491516,
+          "graph_us": 1.4509426433420152
+        }
+      }
+    },
+    {
+      "op": "match_hit",
+      "cap": 32,
+      "timing": {
+        "original": {
+          "eager_us": 17.093440294265747,
+          "graph_us": 3.2073304615323504
+        },
+        "words": {
+          "eager_us": 17.27776050567627,
+          "graph_us": 2.290211589179904
+        }
+      }
+    },
+    {
+      "op": "match_collision",
+      "cap": 32,
+      "timing": {
+        "original": {
+          "eager_us": 17.22272038459778,
+          "graph_us": 4.789661693898484
+        },
+        "words": {
+          "eager_us": 17.344000339508057,
+          "graph_us": 2.976740983909626
+        }
+      }
+    },
+    {
+      "op": "publish_all_new",
+      "cap": 32,
+      "timing": {
+        "original": {
+          "eager_us": 18.439359664916992,
+          "graph_us": 3.4954578423303024
+        },
+        "words": {
+          "eager_us": 16.879359483718872,
+          "graph_us": 2.361889633419938
+        }
+      }
+    },
+    {
+      "op": "publish_mixed",
+      "cap": 32,
+      "timing": {
+        "original": {
+          "eager_us": 18.212159872055054,
+          "graph_us": 3.495427798044239
+        },
+        "words": {
+          "eager_us": 16.695040464401245,
+          "graph_us": 2.331442042902239
+        }
+      }
+    },
+    {
+      "op": "publish_reuse",
+      "cap": 32,
+      "timing": {
+        "original": {
+          "eager_us": 18.26464056968689,
+          "graph_us": 1.631263835889073
+        },
+        "words": {
+          "eager_us": 16.5555202960968,
+          "graph_us": 1.6090178118316556
+        }
+      }
+    },
+    {
+      "op": "fingerprint",
+      "cap": 257,
+      "timing": {
+        "original": {
+          "eager_us": 12.098560333251953,
+          "graph_us": 3.1928960242834687
+        },
+        "words": {
+          "eager_us": 12.48960018157959,
+          "graph_us": 2.254986494107354
+        }
+      }
+    },
+    {
+      "op": "match_miss",
+      "cap": 257,
+      "timing": {
+        "original": {
+          "eager_us": 17.028160095214844,
+          "graph_us": 1.6355607096270346
+        },
+        "words": {
+          "eager_us": 17.246079444885254,
+          "graph_us": 1.6603022307352302
+        }
+      }
+    },
+    {
+      "op": "match_hit",
+      "cap": 257,
+      "timing": {
+        "original": {
+          "eager_us": 17.252800464630127,
+          "graph_us": 3.659059602736205
+        },
+        "words": {
+          "eager_us": 17.296639680862427,
+          "graph_us": 2.8744774410056944
+        }
+      }
+    },
+    {
+      "op": "match_collision",
+      "cap": 257,
+      "timing": {
+        "original": {
+          "eager_us": 17.250880002975464,
+          "graph_us": 5.344438352924723
+        },
+        "words": {
+          "eager_us": 17.34752058982849,
+          "graph_us": 3.9596816808256583
+        }
+      }
+    },
+    {
+      "op": "publish_all_new",
+      "cap": 257,
+      "timing": {
+        "original": {
+          "eager_us": 18.179199695587158,
+          "graph_us": 3.4843845702054206
+        },
+        "words": {
+          "eager_us": 16.858880519866943,
+          "graph_us": 2.2911624207042793
+        }
+      }
+    },
+    {
+      "op": "publish_mixed",
+      "cap": 257,
+      "timing": {
+        "original": {
+          "eager_us": 18.39743971824646,
+          "graph_us": 3.4434552486716266
+        },
+        "words": {
+          "eager_us": 16.695040464401245,
+          "graph_us": 2.2903272900918514
+        }
+      }
+    },
+    {
+      "op": "publish_reuse",
+      "cap": 257,
+      "timing": {
+        "original": {
+          "eager_us": 17.967679500579834,
+          "graph_us": 1.6004173014615033
+        },
+        "words": {
+          "eager_us": 16.34943962097168,
+          "graph_us": 1.6023654471799202
+        }
+      }
+    },
+    {
+      "op": "fingerprint",
+      "cap": 4096,
+      "timing": {
+        "original": {
+          "eager_us": 12.060480117797852,
+          "graph_us": 3.1944819371438933
+        },
+        "words": {
+          "eager_us": 12.248320579528809,
+          "graph_us": 2.242948358709162
+        }
+      }
+    },
+    {
+      "op": "match_miss",
+      "cap": 4096,
+      "timing": {
+        "original": {
+          "eager_us": 17.124799489974976,
+          "graph_us": 2.383879676147811
+        },
+        "words": {
+          "eager_us": 17.24128007888794,
+          "graph_us": 2.261952727857872
+        }
+      }
+    },
+    {
+      "op": "match_hit",
+      "cap": 4096,
+      "timing": {
+        "original": {
+          "eager_us": 17.003519535064697,
+          "graph_us": 4.281043164516608
+        },
+        "words": {
+          "eager_us": 17.04959988594055,
+          "graph_us": 3.592986277542946
+        }
+      }
+    },
+    {
+      "op": "match_collision",
+      "cap": 4096,
+      "timing": {
+        "original": {
+          "eager_us": 17.536959648132324,
+          "graph_us": 5.987113511064045
+        },
+        "words": {
+          "eager_us": 17.487679719924927,
+          "graph_us": 4.824634481584244
+        }
+      }
+    },
+    {
+      "op": "publish_all_new",
+      "cap": 4096,
+      "timing": {
+        "original": {
+          "eager_us": 17.934080362319946,
+          "graph_us": 3.4841533170806036
+        },
+        "words": {
+          "eager_us": 16.61247968673706,
+          "graph_us": 2.299405958505847
+        }
+      }
+    },
+    {
+      "op": "publish_mixed",
+      "cap": 4096,
+      "timing": {
+        "original": {
+          "eager_us": 17.951359748840332,
+          "graph_us": 3.456786900190307
+        },
+        "words": {
+          "eager_us": 16.56864047050476,
+          "graph_us": 2.3168485672747505
+        }
+      }
+    },
+    {
+      "op": "publish_reuse",
+      "cap": 4096,
+      "timing": {
+        "original": {
+          "eager_us": 18.099839687347412,
+          "graph_us": 1.6097783725943562
+        },
+        "words": {
+          "eager_us": 16.586240530014038,
+          "graph_us": 1.6046117430891609
+        }
+      }
+    }
+  ]
+}
