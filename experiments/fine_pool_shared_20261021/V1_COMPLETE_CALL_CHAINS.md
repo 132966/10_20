@@ -2,16 +2,6 @@
 
 本文汇总此前整理的较长调用链，按“谁调用谁、每一步做什么、结果交给谁”展开。默认用 **单个索引键头、128 维向量、1K 桶、64 成员页、32 个查询头**解释；具体接口可能带额外的单例维度。
 
-## 0. 先区分三套路径
-
-| 路径 | 本文如何描述 |
-|---|---|
-| 1K 桶运行时及后台构建 | 用 `submit_build`、`Indexer.prepare`、`Build.run/compute` 等实际名字说明 |
-| 共享精筛实验 | 用 `stage_union → tables → 精筛打分 → normalize → TopK → map_topk` 说明；它与完整后端的接入关系需要区分 |
-| sink＋tail 紧凑拼接 | 最近讨论的目标布局，目前只改了说明文档，不能当作已经改好的 kernel |
-
-下面的总链串起系统的功能依赖，不表示仓库中每个入口都已经实现相同的整条调用。尤其是旧 `Indexer.query()` 会先调用 `_prepare()` 补齐索引，不能把它直接等同于只消费此前快照的后台 overlap 路径。
-
 ## 1. 单请求分块推理的总链
 
 ```text
@@ -159,26 +149,6 @@ publish
 
 归一化只用于分组；重排池里的真实 K 保留原存储表示。中心是原空间均值，不是单位方向的均值。
 
-### 2.2 一个新增 1K 桶的例子
-
-```text
-已有索引范围：[0,65536)
-新增源数据后：长度 66560
-桶大小：1024
-
-→ 新增完整桶编号：64（从 0 开始）
-→ 桶起点：65536
-→ 桶成员范围：[65536,66560)
-→ 读取源页表第 [1024,1040) 项，共 16 项
-→ 形成 128 个叶子组，每组 8 个成员
-→ 产生 16 个成员页、128 个中心
-→ 中心打包为 2 个中心存储页
-→ 更新 state.table[1024:1040]
-→ 更新 state.center_table[128:130]
-```
-
-一页为 8448 字节：前 8192 字节存 64×128 个 FP8 K，后 256 字节存 64 个 FP32 scale。中心使用相同的页布局。成员映射单独保存。
-
 ## 3. 桶内分组的完整链
 
 下面是单轮划分的算法顺序，重复处理组大小 `1024、512、256、128、64、32、16`，最后得到容量为 8 的叶子组。
@@ -214,11 +184,9 @@ publish
 起点 dots → anchor → dots → anchor → 差分 dots → sort
 ```
 
-大组中，每个处理局部成员的 program 可以重复选取相同锚点，再计算自己负责的点积；不同阶段仍需正确排序。小组融合利用单个 program 内的数据复用。优化实验中的融合配置不能自动当成旧 `Build.compute()` 已采用的实现。
+大组中，每个处理局部成员的 program 可以重复选取相同锚点，再计算自己负责的点积；不同阶段仍需正确排序。小组融合利用单个 program 内的数据复用。
 
 ## 4. 查询完整功能链
-
-### 4.1 消费先前快照的查询路径
 
 ```text
 当前层 Q、原生数据准备完成
@@ -280,45 +248,9 @@ publish
 
 `route` 的输出要区分版本：旧接口可能返回请求页序号，共享实验适配输出的是物理页编号。只有完成相应转换，才能直接交给要求物理页号的 `tables`。
 
-### 4.2 旧 Indexer.query 包装入口的实际链
+## 5. 固定候选准备：共享页与紧凑拼接
 
-```text
-Indexer.query(...)
-  → 校验 Q、权重、原生页表、长度和请求标识
-  → 加锁并调用 _begin()
-  → 按请求找本批最大可见长度
-  → 对每个请求调用 _prepare() 补齐索引
-  → 按查询容量档位分批
-  → 获取或创建 Query 工作区/子图
-  → Query.run(...)
-  → 返回位置结果
-  → _finish() 记录完成事件
-```
-
-这个入口包含查询前补齐构建。它与第 4.1 节“只消费前一阶段快照”的调度方式不同；讨论 overlap 时需要指明使用哪个入口。
-
-### 4.3 共享精筛实验中的实际函数链
-
-```text
-Runner.full()
-  → Runner.run_fine()
-      → Runner.prepare()
-          → 共享路径调用 stage()，执行 stage_union 等公共缓存准备
-          → tables(...)
-      → Runner.fine_score()
-          → get_paged_mqa_logits_metadata(...)
-          → fp8_paged_mqa_logits(...)
-          → normalize(...)
-  → Runner.select()
-      → torch.topk(...)
-      → map_topk(...)
-```
-
-该实验以准备好的历史候选页作为输入；粗筛 route 有单独的适配和测试。不能把这段 `Runner.full()` 说成已经执行了完整模型、全部粗筛和 attention。旧 `fused.topk` 也不能在未核对布局的情况下直接替换这里的三步后处理。
-
-## 5. 固定候选准备：已有共享页与紧凑拼接目标
-
-### 5.1 已有共享页方案
+### 5.1 共享页方案
 
 ```text
 逐 Q 可见长度、sink/window、实际就绪终点 E
@@ -337,7 +269,7 @@ Runner.full()
 
 共享的是 K 数据副本，不是所有 Q 的分数或因果边界。每个 Q 仍有自己的长度、页选择、分数和 TopK。
 
-### 5.2 最近讨论的 sink＋tail 紧凑拼接目标
+### 5.2 sink＋tail 紧凑拼接方案
 
 ```text
 有效 sink 和有效 tail
@@ -354,8 +286,6 @@ Runner.full()
 ```
 
 例如 128 个历史槽位、2 个 sink、33 个 tail：紧凑固定候选占一页，打分长度和紧凑长度均为 163，物理页容量共 192。多个 Q 若 tail 起点不同，还需要公共范围描述及逐 Q 区间处理，不能一概假定两个长度相同。
-
-**这部分目前是目标布局说明，未在本次文档更新中改 kernel。** 详细例子见 [sink＋tail 紧凑布局说明](TABLES_NORMALIZE_MAP_TOPK_EXPLAINED.md)。
 
 ## 6. 跨分块 overlap 的完整时间线
 
@@ -430,46 +360,7 @@ Indexer.release_request(owner)
               → 释放/归还中心区域和桶记录资源
 ```
 
-这是缓存接入协议的功能链，不能仅因存在 `release` kernel 就认为所有前缀缓存回调已实现。
-
 两种保留策略的区别：
 
 - **随活跃请求保留**：最后活跃持有结束后释放，后续原生前缀命中可能仍需重建索引。
 - **随原生前缀缓存保留**：请求结束后缓存继续持有桶，后续完整桶命中可以复用；缓存淘汰再解除持有。
-
-## 8. CUDA Graph 加在哪一层
-
-```text
-CPU 准备本次控制输入
-  → 更新固定地址工作区中的长度、预算、源页表、meta 等
-  → 建立必要的流间依赖
-  → execute()
-      ├─ eager：按顺序提交 kernel
-      └─ graph：回放已捕获的兼容子图
-  → 记录完成事件
-  → 后续消费者依事件读取结果
-```
-
-Graph 改变提交方式，不改变建索引、过滤、TopK 和映射的语义。可变化的长度和预算必须由对应入口真正支持，且不得超过捕获容量。某个子图支持 Graph，不等于全部 Python 状态管理或完整模型路径都可以直接捕获。
-
-## 9. 实现和详细说明入口
-
-以下链接均指向本仓库中的文件。
-
-| 内容 | 文件 |
-|---|---|
-| 后端快照、构建提交 | [qwen_gqa_probe_backend.py](../../qwen_gqa_probe_backend.py) |
-| 1K 桶、请求状态、查询及释放运行时 | [v1_deepseek/runtime.py](../../sglang/srt/layers/attention/v1_deepseek/runtime.py) |
-| 建索引和页管理 kernel | [v1_deepseek/kernels.py](../../sglang/srt/layers/attention/v1_deepseek/kernels.py) |
-| 原始分组实现 | [v1_native/fused_grouping.py](../../sglang/srt/layers/attention/v1_native/fused_grouping.py) |
-| 分组等优化实验 | [优化实验 runtime](../v1_kernel_opt_20261022/runtime.py)、[optimized.py](../v1_kernel_opt_20261022/optimized.py) |
-| 原查询融合包装与 CUDA 实现 | [query_fused.py](../../sglang/srt/layers/attention/v1_deepseek/query_fused.py)、[v1_query.cuh](../../sglang/kernels/jit/csrc/deepseek_v4/v1_query.cuh) |
-| 共享布局 route 适配 | [route_shared.py](route_shared.py)、[route_shared.cu](route_shared.cu) |
-| 公共页复制 | [tail_union.py](tail_union.py) |
-| tables、normalize、map_topk | [kernels.py](kernels.py) |
-| 共享精筛实验调用链 | [experiment.py](experiment.py) |
-| 逐步建索引代码导读 | [README_INDEX_BUILD_1K.md](../../sglang/srt/layers/attention/v1_deepseek/README_INDEX_BUILD_1K.md) |
-| 算子汇总表 | [MLA_INDEX_KERNELS_SHARED.md](MLA_INDEX_KERNELS_SHARED.md) |
-| sink＋tail 紧凑拼接目标布局 | [TABLES_NORMALIZE_MAP_TOPK_EXPLAINED.md](TABLES_NORMALIZE_MAP_TOPK_EXPLAINED.md) |
-
-本文由此前论文附录“运行时调用链与完整输入输出示例”、1K 建索引导读及上述代码入口整理。本次新增说明文档，不修改运行时或 kernel，不新增性能测试。
